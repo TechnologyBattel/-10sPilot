@@ -9,6 +9,8 @@ from app.modules.keyword_engine import (
     KeywordService,
 )
 
+# POST /api/v1/keywords/expand and /cluster live in app.modules.keyword_engine.router.
+
 router = APIRouter()
 service = KeywordService()
 
@@ -21,8 +23,3 @@ async def research(request: KeywordResearchRequest) -> list[Keyword]:
 @router.post("/clusters", response_model=list[KeywordCluster])
 async def clusters(request: KeywordResearchRequest) -> list[KeywordCluster]:
     return await service.research_and_cluster(request)
-
-
-@router.post("/cluster", response_model=list[KeywordCluster])
-def cluster(keywords: list[Keyword]) -> list[KeywordCluster]:
-    return service.cluster(keywords)

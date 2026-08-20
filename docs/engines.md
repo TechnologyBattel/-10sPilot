@@ -3,7 +3,7 @@
 | Engine | Path | Responsibility |
 | --- | --- | --- |
 | SERP | `app/modules/serp_engine` | Serper.dev search + Google Search Console rows, with a keyless HTML scrape fallback; central ranking source |
-| Keyword | `app/modules/keyword_engine` | Discovery from SERP signals, intent classification, token-overlap clustering |
+| Keyword | `app/modules/keyword_engine` | Seed expansion from SERP signals (People Also Ask + related searches), intent classification, TF-IDF/cosine clustering |
 | Content | `app/modules/content_engine` | Briefs and drafts, scored by the AEO and GEO engines |
 | Audit | `app/modules/audit_engine` | Technical SEO checks (title, meta, H1, alt, canonical, JSON-LD, viewport, thin content) |
 | AEO | `app/modules/aeo_engine` | Answer Engine Optimization signals for ChatGPT / Perplexity extraction |
@@ -20,6 +20,16 @@
 `get_serp_results(keyword)` in `free_serp.py` is the single entry point: it calls Serper.dev when
 `SERPER_API_KEY` is set and otherwise scrapes a JS-free HTML SERP (`scrape.py`) so local
 development needs no key. Scraping is best-effort — rate limits can yield an empty list.
+
+## Keyword endpoints
+
+- `POST /api/v1/keywords/expand` `{seed}` → `{seed, keywords[]}` — `expand_keywords()` reads
+  People Also Ask and related searches from Serper, or falls back to the keyless SERP scrape.
+- `POST /api/v1/keywords/cluster` `{keywords: []}` → `{clusters: [{name, keywords, intent}]}` —
+  `cluster_keywords()` uses scikit-learn TF-IDF character n-grams plus cosine similarity, so no
+  paid embedding API is involved.
+- `POST /api/v1/keywords/research` and `/clusters` return the richer `Keyword` objects (intent,
+  difficulty, opportunity).
 
 ## MCP tools
 
