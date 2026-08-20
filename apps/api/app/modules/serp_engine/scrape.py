@@ -41,12 +41,18 @@ def _clean_link(href: str) -> str:
     return unquote(target[0]) if target else href
 
 
+def _is_ad(link: str) -> bool:
+    """Sponsored rows stay on the engine's own redirect host instead of the target site."""
+    host = urlparse(link).netloc.removeprefix("www.")
+    return host.endswith("duckduckgo.com") or host.endswith("bing.com")
+
+
 def parse_scraped_results(markup: str, limit: int) -> list[SerpResult]:
     results: list[SerpResult] = []
     for match in _RESULT_RE.finditer(markup):
         link = _clean_link(match.group("href"))
         title = _text(match.group("title"))
-        if not link or not title:
+        if not link or not title or _is_ad(link):
             continue
         snippet_match = _SNIPPET_RE.search(match.group("rest"))
         results.append(
