@@ -11,16 +11,21 @@
 ```bash
 pnpm install
 ./apps/api/scripts/bootstrap.sh
-cp .env.example .env    # fill in DATABASE_URL and an AI key
+cp .env.example .env
 pnpm dev
 ```
 
-- Web: http://localhost:3000
-- API: http://localhost:8000 (OpenAPI docs at `/docs`)
+- Web: http://localhost:3000 (the header shows live API health)
+- API: http://localhost:8000 — OpenAPI docs at `/docs`, health at `/api/v1/health`
 
-## Database
+## Keys (all free)
 
-```bash
-pnpm --filter @10spilot/db db:generate
-pnpm --filter @10spilot/db db:migrate
-```
+| Variable | Where to get it |
+| --- | --- |
+| `SERPER_API_KEY` | serper.dev — 2,500 free searches |
+| `GSC_ACCESS_TOKEN`, `GSC_SITE_URL` | Google Search Console API for a verified property |
+| `GROQ_API_KEY` | console.groq.com |
+| `GOOGLE_API_KEY` | aistudio.google.com |
+
+`OPENAI_API_KEY` and `PERPLEXITY_API_KEY` are optional; without them the citation monitor reports
+those engines as unavailable instead of failing the run.

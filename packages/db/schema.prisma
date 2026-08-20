@@ -1,0 +1,189 @@
+// 10sPilot data model.
+// Postgres on the Supabase free tier; run `pnpm --filter @10spilot/db db:migrate` after edits.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
+}
+
+enum ContentStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+}
+
+enum WorkflowStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+enum SearchIntent {
+  INFORMATIONAL
+  COMMERCIAL
+  TRANSACTIONAL
+  NAVIGATIONAL
+}
+
+enum AiEngine {
+  CHATGPT
+  PERPLEXITY
+  GEMINI
+  COPILOT
+  AI_OVERVIEWS
+}
+
+model Project {
+  id         String   @id @default(cuid())
+  name       String
+  domain     String   @unique
+  country    String   @default("us")
+  language   String   @default("en")
+  gscSiteUrl String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  keywords     Keyword[]
+  clusters     KeywordCluster[]
+  contents     Content[]
+  audits       Audit[]
+  rankings     Ranking[]
+  aiCitations  AiCitation[]
+  workflowRuns WorkflowRun[]
+
+  @@map("projects")
+}
+
+model Keyword {
+  id          String       @id @default(cuid())
+  projectId   String
+  term        String
+  intent      SearchIntent @default(INFORMATIONAL)
+  volume      Int?
+  difficulty  Float        @default(0)
+  opportunity Float        @default(0)
+  clusterId   String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  project  Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  cluster  KeywordCluster? @relation(fields: [clusterId], references: [id], onDelete: SetNull)
+  rankings Ranking[]
+  contents Content[]
+
+  @@unique([projectId, term])
+  @@index([clusterId])
+  @@map("keywords")
+}
+
+model KeywordCluster {
+  id          String   @id @default(cuid())
+  projectId   String
+  label       String
+  pillarTopic String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project  Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  keywords Keyword[]
+  contents Content[]
+
+  @@unique([projectId, label])
+  @@map("keyword_clusters")
+}
+
+model Content {
+  id          String        @id @default(cuid())
+  projectId   String
+  keywordId   String?
+  clusterId   String?
+  title       String
+  slug        String
+  markdown    String        @default("")
+  status      ContentStatus @default(DRAFT)
+  aeoScore    Float         @default(0)
+  geoScore    Float         @default(0)
+  wordCount   Int           @default(0)
+  publishedAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  project Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  keyword Keyword?        @relation(fields: [keywordId], references: [id], onDelete: SetNull)
+  cluster KeywordCluster? @relation(fields: [clusterId], references: [id], onDelete: SetNull)
+
+  @@unique([projectId, slug])
+  @@map("contents")
+}
+
+model Audit {
+  id         String   @id @default(cuid())
+  projectId  String
+  url        String
+  statusCode Int      @default(0)
+  score      Float    @default(0)
+  issues     Json     @default("[]")
+  createdAt  DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, url])
+  @@map("audits")
+}
+
+model Ranking {
+  id          String   @id @default(cuid())
+  projectId   String
+  keywordId   String
+  position    Int?
+  url         String?
+  clicks      Int      @default(0)
+  impressions Int      @default(0)
+  source      String   @default("serper")
+  checkedAt   DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  keyword Keyword @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+
+  @@index([keywordId, checkedAt])
+  @@map("rankings")
+}
+
+model AiCitation {
+  id            String   @id @default(cuid())
+  projectId     String
+  engine        AiEngine
+  prompt        String
+  cited         Boolean  @default(false)
+  mentioned     Boolean  @default(false)
+  position      Int?
+  answerExcerpt String   @default("")
+  checkedAt     DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, engine, checkedAt])
+  @@map("ai_citations")
+}
+
+model WorkflowRun {
+  id         String         @id @default(cuid())
+  projectId  String
+  workflow   String         @default("full_pilot")
+  status     WorkflowStatus @default(QUEUED)
+  steps      Json           @default("[]")
+  error      String?
+  startedAt  DateTime       @default(now())
+  finishedAt DateTime?
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, startedAt])
+  @@map("workflow_runs")
+}

@@ -12,12 +12,14 @@ Layout:
 
 ```
 app/
-  api/v1/routes/   HTTP endpoints
-  core/            config, logging, security
+  api/v1/routes/   HTTP endpoints (rankings, keywords, content, audit, ai-citations, links, workflow, tools)
+  modules/         the nine engines (see ../../docs/engines.md)
+  tools/           MCP tools + registry
+  core/            config, errors, logging, security
   db/              engine + session
   models/          SQLAlchemy models
-  schemas/         Pydantic request/response models
-  services/        business logic
+  schemas/         shared Pydantic models
+  services/        cross-engine services (LLM client)
   workers/         background jobs
 tests/
 ```
