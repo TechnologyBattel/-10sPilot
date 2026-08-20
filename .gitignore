@@ -25,3 +25,6 @@ coverage/
 .ruff_cache/
 .mypy_cache/
 *.log
+
+# python build artifacts
+*.egg-info/

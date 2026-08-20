@@ -2,7 +2,7 @@
 
 | Engine | Path | Responsibility |
 | --- | --- | --- |
-| SERP | `app/modules/serp_engine` | Serper.dev search + Google Search Console rows; central ranking source |
+| SERP | `app/modules/serp_engine` | Serper.dev search + Google Search Console rows, with a keyless HTML scrape fallback; central ranking source |
 | Keyword | `app/modules/keyword_engine` | Discovery from SERP signals, intent classification, token-overlap clustering |
 | Content | `app/modules/content_engine` | Briefs and drafts, scored by the AEO and GEO engines |
 | Audit | `app/modules/audit_engine` | Technical SEO checks (title, meta, H1, alt, canonical, JSON-LD, viewport, thin content) |
@@ -11,6 +11,15 @@
 | Citation monitor | `app/modules/citation_monitor` | Probes ChatGPT, Perplexity and Gemini and records whether we are cited |
 | Link | `app/modules/link_engine` | Relevance-ranked internal link suggestions with anchor text |
 | Workflow | `app/modules/workflow_engine` | Autonomous agent that plans and chains every MCP tool |
+
+## SERP endpoints
+
+`POST /api/v1/serp/search` with `{"keyword": "...", "domain": "example.com"}` returns
+`{keyword, domain, results[{position, title, url, snippet}], domain_position}`.
+
+`get_serp_results(keyword)` in `free_serp.py` is the single entry point: it calls Serper.dev when
+`SERPER_API_KEY` is set and otherwise scrapes a JS-free HTML SERP (`scrape.py`) so local
+development needs no key. Scraping is best-effort — rate limits can yield an empty list.
 
 ## MCP tools
 

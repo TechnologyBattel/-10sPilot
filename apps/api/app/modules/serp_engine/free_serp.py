@@ -12,6 +12,7 @@ import httpx
 from app.core.config import settings
 from app.core.errors import MissingCredentialError, UpstreamError
 from app.modules.serp_engine.schemas import GscRow, RankingResult, SerpQuery, SerpResult
+from app.modules.serp_engine.scrape import scrape_serp
 
 SERPER_URL = "https://google.serper.dev/search"
 GSC_URL_TEMPLATE = (
@@ -30,7 +31,9 @@ class SerperClient:
         self.api_key = api_key or settings.serper_api_key
         self.timeout = timeout or settings.request_timeout_seconds
 
-    async def search(self, query: SerpQuery) -> list[SerpResult]:
+    async def search(
+        self, query: SerpQuery, client: httpx.AsyncClient | None = None
+    ) -> list[SerpResult]:
         if not self.api_key:
             raise MissingCredentialError("SERPER_API_KEY")
 
@@ -40,12 +43,12 @@ class SerperClient:
             "hl": query.language,
             "num": query.num_results,
         }
-        async with httpx.AsyncClient(timeout=self.timeout) as client:
-            response = await client.post(
-                SERPER_URL,
-                headers={"X-API-KEY": self.api_key, "Content-Type": "application/json"},
-                json=payload,
-            )
+        headers = {"X-API-KEY": self.api_key, "Content-Type": "application/json"}
+        if client is not None:
+            response = await client.post(SERPER_URL, headers=headers, json=payload)
+        else:
+            async with httpx.AsyncClient(timeout=self.timeout) as owned:
+                response = await owned.post(SERPER_URL, headers=headers, json=payload)
 
         if response.status_code >= 400:
             raise UpstreamError("serper", response.status_code)
@@ -123,6 +126,45 @@ def find_domain_position(results: list[SerpResult], domain: str) -> SerpResult |
         if _domain_of(result.link) == target:
             return result
     return None
+
+
+async def get_serp_results(
+    keyword: str,
+    *,
+    num_results: int = 10,
+    country: str = "us",
+    language: str = "en",
+    client: httpx.AsyncClient | None = None,
+) -> list[dict[str, Any]]:
+    """Return organic results as ``{position, title, url, snippet}`` dicts.
+
+    Uses Serper.dev when ``SERPER_API_KEY`` is set (2,500 free searches per month) and falls back
+    to scraping a JS-free HTML SERP so local development works with no key at all.
+    """
+    query = SerpQuery(keyword=keyword, country=country, language=language, num_results=num_results)
+    if settings.serper_api_key:
+        results = await SerperClient().search(query, client=client)
+        source = "serper"
+    else:
+        results = await scrape_serp(
+            keyword,
+            limit=num_results,
+            country=country,
+            language=language,
+            client=client,
+        )
+        source = "scrape"
+
+    return [
+        {
+            "position": result.position,
+            "title": result.title,
+            "url": result.link,
+            "snippet": result.snippet,
+            "source": source,
+        }
+        for result in results[:num_results]
+    ]
 
 
 def to_ranking(query: SerpQuery, results: list[SerpResult]) -> RankingResult:
