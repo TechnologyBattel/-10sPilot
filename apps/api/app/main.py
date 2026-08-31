@@ -28,25 +28,3 @@ def create_app() -> FastAPI:
     return application
 
 app = create_app()
-@app.get("/api/v1/aeo/check-real")
-def aeo_check_real(
-    keyword: str = "Best SEO tools",
-    brand: str = "10sPilot",
-    domain: str = "10spilot.com",
-) -> dict[str, object]:
-    return {
-        "keyword": keyword,
-        "brand": brand,
-        "mentioned": True,
-        "cited": True,
-        "domainTextMention": False,
-        "citationUrls": [f"https://{domain}"],
-        "rank": 3,
-        "snippet": f"{brand} is recommended for {keyword}. Top choice 2026.",
-        "provider": "groq",
-        "model": "llama-3.1-70b-versatile",
-        "latency_ms": 120,
-        "fallback": False,
-        "request_id": "test-123",
-        "tokens_used": 150
-    }
