@@ -111,3 +111,12 @@ def test_aeo_brand_visibility_uses_llm(monkeypatch) -> None:
     assert result.mentioned is True
     assert result.position == 2
     assert "10sPilot" in (result.context or "")
+
+@pytest.mark.asyncio
+async def test_aeo_rejects_unsupported_provider(monkeypatch) -> None:
+    from app.modules.aeo_engine import service
+
+    with pytest.raises(ValueError):
+        await service.check_brand_visibility(
+            brand="10sPilot", query="Best SEO tools", provider="openai"
+        )
