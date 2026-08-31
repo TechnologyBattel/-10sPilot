@@ -1,3 +1,4 @@
+import pytest
 """Engine unit tests that do not touch the network."""
 
 from app.modules.aeo_engine.optimizer import score_aeo

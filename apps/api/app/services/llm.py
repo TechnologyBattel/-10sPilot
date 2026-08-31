@@ -10,6 +10,8 @@ from app.core.errors import MissingCredentialError, UpstreamError
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 
+SUPPORTED_PROVIDERS = {"groq", "gemini"}
+
 
 class LlmClient:
     """Talks to Groq or Gemini, both of which have free API tiers."""
@@ -19,6 +21,10 @@ class LlmClient:
         self.timeout = timeout or settings.request_timeout_seconds
 
     async def complete(self, prompt: str, system: str | None = None) -> str:
+        if self.provider not in SUPPORTED_PROVIDERS:
+            raise ValueError(
+                f"Unsupported provider: {self.provider!r}. Supported: {SUPPORTED_PROVIDERS}"
+            )
         if self.provider == "gemini":
             return await self._complete_gemini(prompt, system)
         return await self._complete_groq(prompt, system)

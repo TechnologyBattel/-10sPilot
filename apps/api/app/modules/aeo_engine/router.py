@@ -8,7 +8,7 @@ router = APIRouter(prefix="/api/v1/aeo", tags=["aeo"])
 class AEOCheckRequest(BaseModel):
     brand: str = Field(min_length=1)
     query: str = Field(min_length=1)
-    providers: list[str] = Field(default=["openai"])
+    providers: list[str] = Field(default=["groq"])
 
 class AEOResult(BaseModel):
     brand: str
