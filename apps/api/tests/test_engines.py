@@ -121,3 +121,12 @@ async def test_aeo_rejects_unsupported_provider(monkeypatch) -> None:
         await service.check_brand_visibility(
             brand="10sPilot", query="Best SEO tools", provider="openai"
         )
+
+def test_assert_safe_url_blocks_private_ip() -> None:
+    from app.core.url_safety import UnsafeUrlError, assert_safe_url
+
+    with pytest.raises(UnsafeUrlError):
+        assert_safe_url("http://127.0.0.1/")
+
+    with pytest.raises(UnsafeUrlError):
+        assert_safe_url("http://169.254.169.254/")

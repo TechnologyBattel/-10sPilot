@@ -3,6 +3,7 @@
 import httpx
 
 from app.core.config import settings
+from app.core.url_safety import assert_safe_url
 from app.modules.audit_engine.checks import (
     extract_meta_description,
     extract_title,
@@ -19,7 +20,8 @@ class AuditService:
         self.timeout = timeout or settings.request_timeout_seconds
 
     async def audit(self, request: AuditRequest) -> AuditReport:
-        async with httpx.AsyncClient(timeout=self.timeout, follow_redirects=True) as client:
+        assert_safe_url(request.url)
+        async with httpx.AsyncClient(timeout=self.timeout, follow_redirects=False) as client:
             response = await client.get(request.url, headers={"User-Agent": "10sPilotBot/0.1"})
 
         html = response.text
