@@ -14,7 +14,7 @@ class AeoService:
 async def check_brand_visibility(
     brand: str,
     query: str,
-    provider: str = "openai",
+    provider: str = "groq",
 ) -> AEOResult:
     llm = LlmClient(provider=provider)
 
