@@ -1,7 +1,8 @@
 ﻿"""Version 1 API router - FIXED."""
 
 from fastapi import APIRouter
-from app.api.v1.routes import health
+
+from app.api.v1.routes import health, tools
 
 api_router = APIRouter()
 api_router.include_router(health.router, tags=["health"])
@@ -13,4 +14,4 @@ api_router.include_router(health.router, tags=["health"])
 # api_router.include_router(citations.router, prefix="/ai-citations", tags=["ai-citations"])
 # api_router.include_router(links.router, prefix="/links", tags=["links"])
 # api_router.include_router(workflow.router, prefix="/workflow", tags=["workflow"])
-# api_router.include_router(tools.router, prefix="/tools", tags=["tools"])
+api_router.include_router(tools.router, prefix="/tools", tags=["tools"])

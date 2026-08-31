@@ -9,11 +9,11 @@ const seoTypeSchema = z.object({
 
 const requiredIds = ['aeo','geo','llmo','messaging-app-seo']
 
-export function validateContentSchema(data: any) {
+export function validateContentSchema(data: unknown) {
   const parsed = z.array(seoTypeSchema).parse(data)
   const ids = parsed.map(d => d.id)
   for (const req of requiredIds) {
-    if (!ids.includes(req)) throw new Error(Missing required ID: )
+    if (!ids.includes(req)) throw new Error(`Missing required ID: ${req}`)
   }
   const priorityA = parsed.filter(d => d.priority === 'A')
   if (priorityA.length < 4) throw new Error('Need at least 4 Priority A')

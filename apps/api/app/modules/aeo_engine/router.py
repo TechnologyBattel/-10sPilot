@@ -19,7 +19,7 @@ class AEOResult(BaseModel):
     provider: str
 
 @router.post("/check", response_model=list[AEOResult])
-async def check_aeo(req: AEOCheckRequest):
+async def check_aeo(req: AEOCheckRequest) -> list[AEOResult]:
     from app.modules.aeo_engine.service import check_brand_visibility
     results = []
     for provider in req.providers:
@@ -28,5 +28,5 @@ async def check_aeo(req: AEOCheckRequest):
     return results
 
 @router.get("/health")
-async def health():
+async def health() -> dict[str, str]:
     return {"status": "aeo_engine ready", "cost_per_check": ".01"}

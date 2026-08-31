@@ -6,9 +6,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.router import api_router
 from app.api.v1.routes import health
 from app.core.config import settings
+from app.modules.aeo_engine.router import router as aeo_router
 from app.modules.keyword_engine.router import router as keyword_router
 from app.modules.serp_engine.router import router as serp_router
-from app.modules.aeo_engine.router import router as aeo_router
+
 
 def create_app() -> FastAPI:
     application = FastAPI(title=settings.app_name, version=settings.version)
@@ -28,7 +29,11 @@ def create_app() -> FastAPI:
 
 app = create_app()
 @app.get("/api/v1/aeo/check-real")
-def aeo_check_real(keyword: str = "Best SEO tools", brand: str = "10sPilot", domain: str = "10spilot.com"):
+def aeo_check_real(
+    keyword: str = "Best SEO tools",
+    brand: str = "10sPilot",
+    domain: str = "10spilot.com",
+) -> dict[str, object]:
     return {
         "keyword": keyword,
         "brand": brand,

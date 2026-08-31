@@ -85,3 +85,29 @@ def test_link_suggestions_rank_by_relevance() -> None:
     )
     suggestions = LinkService().suggest(request)
     assert suggestions and suggestions[0].target_url == "https://example.com/aeo-guide"
+
+
+def test_aeo_brand_visibility_uses_llm(monkeypatch) -> None:
+    from app.modules.aeo_engine import service
+
+    class FakeLlm:
+        def __init__(self, provider: str | None = None) -> None:
+            self.provider = provider
+
+        async def complete(self, prompt: str, system: str | None = None) -> str:
+            assert "10sPilot" in prompt
+            assert "Best SEO tools" in prompt
+            return "10sPilot is mentioned at position 2."
+
+    monkeypatch.setattr(service, "LlmClient", FakeLlm)
+
+    result = __import__("asyncio").run(
+        service.check_brand_visibility(
+            brand="10sPilot",
+            query="Best SEO tools",
+        )
+    )
+
+    assert result.mentioned is True
+    assert result.position == 2
+    assert "10sPilot" in (result.context or "")

@@ -10,22 +10,59 @@ export class ApiError extends Error {
   }
 }
 
-export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+export async function apiFetch<T>(
+  path: string,
+  init?: RequestInit,
+): Promise<T> {
   const response = await fetch(`${env.apiUrl}${path}`, {
     ...init,
-    headers: { 'content-type': 'application/json', ...init?.headers },
+    headers: {
+      'content-type': 'application/json',
+      ...init?.headers,
+    },
     cache: 'no-store',
   });
 
   if (!response.ok) {
-    throw new ApiError(`Request to ${path} failed`, response.status);
+    throw new ApiError(
+      `Request to ${path} failed`,
+      response.status,
+    );
   }
 
   return (await response.json()) as T;
 }
 
-export type HealthResponse = { status: string; service: string; version: string };
+export type HealthResponse = {
+  status: string;
+  service?: string;
+  version?: string;
+};
 
 export function getApiHealth(): Promise<HealthResponse> {
   return apiFetch<HealthResponse>('/health');
+}
+
+export type AEOResult = {
+  brand: string;
+  query: string;
+  mentioned: boolean;
+  position: number | null;
+  context: string | null;
+  provider: string;
+};
+
+export function getAEOCheck(
+  brand: string,
+  query: string,
+  providers: string[] = ['openai'],
+): Promise<AEOResult[]> {
+  return apiFetch<AEOResult[]>('/api/v1/aeo/check', {
+    method: 'POST',
+    body: JSON.stringify({
+      brand,
+      query,
+      providers,
+    }),
+  });
 }

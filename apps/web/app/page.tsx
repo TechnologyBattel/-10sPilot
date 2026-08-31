@@ -20,7 +20,7 @@ export default function Home() {
             <Link href="/dashboard" className="px-8 py-4 bg-white text-black rounded-full font-bold">
               Check My Brand Free - 50 Checks
             </Link>
-            <Link href="/docs" className="px-8 py-4 bg-white/10 rounded-full">
+            <Link href="/ai-citations" className="px-8 py-4 bg-white/10 rounded-full">
               See Live Demo
             </Link>
           </div>
@@ -52,7 +52,7 @@ export default function Home() {
             <h2 className="text-3xl font-bold mb-4">10sPilot Score - Unified Visibility</h2>
             <p className="text-gray-400 mb-6">SERP 40% + ChatGPT 30% + Perplexity 20% + AI Overview 10% = ONE Number 0-100</p>
             <div className="text-6xl font-bold">87/100</div>
-            <div className="text-sm text-gray-500 mt-2">Example: 10sPilot.com for 'Best AI SEO tools'</div>
+            <div className="text-sm text-gray-500 mt-2">Example: 10sPilot.com for &apos;Best AI SEO tools&apos;</div>
           </div>
         </div>
       </section>
