@@ -7,6 +7,7 @@ from app.api.v1.router import api_router
 from app.api.v1.routes import health
 from app.core.config import settings
 from app.modules.aeo_engine.router import router as aeo_router
+from app.modules.audit_engine.router import router as audit_router
 from app.modules.keyword_engine.router import router as keyword_router
 from app.modules.serp_engine.router import router as serp_router
 
@@ -25,6 +26,7 @@ def create_app() -> FastAPI:
     application.include_router(serp_router)
     application.include_router(keyword_router)
     application.include_router(aeo_router)
+    application.include_router(audit_router)
     return application
 
 app = create_app()
