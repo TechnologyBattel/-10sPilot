@@ -2,10 +2,11 @@
 
 from fastapi import APIRouter
 
-from app.api.v1.routes import health, tools
+from app.api.v1.routes import health, projects, tools
 
 api_router = APIRouter()
 api_router.include_router(health.router, tags=["health"])
+api_router.include_router(projects.router, prefix="/projects", tags=["projects"])
 # api_router.include_router(rankings.router, prefix="/rankings", tags=["rankings"])
 # api_router.include_router(keywords.router, prefix="/keywords", tags=["keywords"])
 # api_router.include_router(content.router, prefix="/content", tags=["content"])
