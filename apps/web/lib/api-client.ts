@@ -55,7 +55,7 @@ export type AEOResult = {
 export function getAEOCheck(
   brand: string,
   query: string,
-  providers: string[] = ['openai'],
+  providers: string[] = ['groq'],
 ): Promise<AEOResult[]> {
   return apiFetch<AEOResult[]>('/api/v1/aeo/check', {
     method: 'POST',

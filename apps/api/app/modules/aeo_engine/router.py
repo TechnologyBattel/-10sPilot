@@ -1,7 +1,9 @@
-﻿"""AEO engine - ChatGPT visibility tracker."""
+"""AEO engine - ChatGPT visibility tracker."""
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from pydantic import BaseModel, Field
+
+from app.core.limiter import limiter
 
 router = APIRouter(prefix="/api/v1/aeo", tags=["aeo"])
 
@@ -19,7 +21,8 @@ class AEOResult(BaseModel):
     provider: str
 
 @router.post("/check", response_model=list[AEOResult])
-async def check_aeo(req: AEOCheckRequest) -> list[AEOResult]:
+@limiter.limit("5/minute")
+async def check_aeo(request: Request, req: AEOCheckRequest) -> list[AEOResult]:
     from app.modules.aeo_engine.service import check_brand_visibility
     results = []
     for provider in req.providers:

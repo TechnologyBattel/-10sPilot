@@ -1,19 +1,14 @@
-import { Card } from '@/components/ui/card';
 import { PageHeader } from '@/components/ui/page-header';
-
-const ENGINES = ['ChatGPT', 'Perplexity', 'Gemini'];
 
 export default function AiCitationsPage() {
   return (
     <>
       <PageHeader
         title="AI Citations"
-        description="Whether answer engines cite your domain for the prompts that matter."
+        description="Citation monitoring is not available yet."
       />
-      <div className="grid gap-4 sm:grid-cols-3">
-        {ENGINES.map((engine) => (
-          <Card key={engine} title={engine} description="No checks recorded yet." />
-        ))}
+      <div className="rounded-lg border border-black/10 p-6 text-sm text-black/70 dark:border-white/20 dark:text-white/70">
+        This capability is coming soon. It is not included in the navigation until it is ready.
       </div>
     </>
   );

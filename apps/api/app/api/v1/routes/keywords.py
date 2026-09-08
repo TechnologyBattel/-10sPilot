@@ -1,7 +1,8 @@
 """Keyword research and clustering endpoints."""
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 
+from app.core.limiter import limiter
 from app.modules.keyword_engine import (
     Keyword,
     KeywordCluster,
@@ -16,10 +17,12 @@ service = KeywordService()
 
 
 @router.post("/research", response_model=list[Keyword])
-async def research(request: KeywordResearchRequest) -> list[Keyword]:
-    return await service.research(request)
+@limiter.limit("20/minute")
+async def research(request: Request, payload: KeywordResearchRequest) -> list[Keyword]:
+    return await service.research(payload)
 
 
 @router.post("/clusters", response_model=list[KeywordCluster])
-async def clusters(request: KeywordResearchRequest) -> list[KeywordCluster]:
-    return await service.research_and_cluster(request)
+@limiter.limit("20/minute")
+async def clusters(request: Request, payload: KeywordResearchRequest) -> list[KeywordCluster]:
+    return await service.research_and_cluster(payload)

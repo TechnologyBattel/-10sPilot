@@ -1,61 +1,136 @@
-﻿import Link from 'next/link'
+import Link from 'next/link'
+
+import { SiteFooter } from '@/components/layout/site-footer'
+
+function AeoIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="32"
+      height="32"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="text-purple-400"
+      aria-hidden="true"
+    >
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.35-4.35" />
+      <path d="M11 8v6M8 11h6" />
+    </svg>
+  )
+}
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-black text-white">
-      {/* Hero - AEO/GEO Highlighted */}
-      <section className="pt-20 pb-32 px-6">
+    <main className="flex min-h-screen flex-col bg-black text-white">
+      {/* Hero */}
+      <section className="px-4 py-16 sm:px-6 sm:py-24">
         <div className="max-w-7xl mx-auto text-center">
-          <div className="inline-flex px-4 py-2 bg-white/10 rounded-full text-sm mb-6">
-            🚀 10sPilot - 9.95/10 Rated - AEO + GEO + LLMO
-          </div>
-          <h1 className="text-6xl font-bold mb-6">
-            Does <span className="text-purple-400">ChatGPT</span> Mention Your Brand?
+          <h1 className="text-4xl font-bold leading-tight sm:text-6xl mb-6">
+            Is Your Brand Visible in{' '}
+            <span className="text-purple-400">AI Search?</span>
           </h1>
-          <p className="text-xl text-gray-400 mb-8 max-w-3xl mx-auto">
-            10sPilot checks if your brand appears in ChatGPT, Perplexity, Google AI Overviews. 
-            Unified 10sPilot Score.  cost with Groq free tier. 1/10th price of  tools.
+          <p className="text-lg text-gray-400 mb-8 max-w-3xl mx-auto sm:text-xl">
+            Diagnose your brand&apos;s visibility in AI search, AI answer engines, and AI overviews.
           </p>
           <div className="flex gap-4 justify-center mb-12">
-            <Link href="/dashboard" className="px-8 py-4 bg-white text-black rounded-full font-bold">
-              Check My Brand Free - 50 Checks
-            </Link>
-            <Link href="/ai-citations" className="px-8 py-4 bg-white/10 rounded-full">
-              See Live Demo
+            <Link
+              href="/dashboard"
+              className="px-8 py-4 bg-white text-black rounded-full font-bold"
+            >
+              Open AEO Diagnostic
             </Link>
           </div>
-          
-          {/* 3 Pillars */}
-          <div className="grid md:grid-cols-3 gap-6 mt-20">
-            <div className="p-8 bg-white/5 rounded-2xl border border-white/10">
-              <div className="text-4xl mb-4">🤖</div>
-              <h3 className="text-xl font-bold mb-2">AEO Engine</h3>
-              <p className="text-gray-400 text-sm mb-4">Answer Engine Optimization - ChatGPT, Perplexity, Claude tracking</p>
-              <div className="text-xs text-purple-400">POST /api/v1/aeo/check - LIVE ✅</div>
+
+          {/* AEO Engine Feature Card */}
+          <div className="flex justify-center mt-20">
+            <div className="p-8 bg-white/5 rounded-2xl border border-white/10 max-w-md w-full text-left">
+              <div className="mb-4">
+                <AeoIcon />
+              </div>
+              <h3 className="text-xl font-bold mb-2">
+                AEO Engine — Answer Engine Optimization
+              </h3>
+              <p className="text-gray-400 text-sm">
+                Review brand mention status, answer position when available, and response context.
+              </p>
             </div>
-            <div className="p-8 bg-white/5 rounded-2xl border border-white/10">
-              <div className="text-4xl mb-4">🔍</div>
-              <h3 className="text-xl font-bold mb-2">GEO Engine</h3>
-              <p className="text-gray-400 text-sm mb-4">Generative Engine Optimization - Google AI Overviews</p>
-              <div className="text-xs text-yellow-400">POST /api/v1/geo/check - Building ⬜</div>
-            </div>
-            <div className="p-8 bg-white/5 rounded-2xl border border-white/10">
-              <div className="text-4xl mb-4">📄</div>
-              <h3 className="text-xl font-bold mb-2">LLMO Engine</h3>
-              <p className="text-gray-400 text-sm mb-4">LLM Optimization - llms.txt, Schema, FAQ</p>
-              <div className="text-xs text-green-400">POST /api/v1/llmo/generate - Next ⬜</div>
-            </div>
-          </div>
-          
-          {/* 10sPilot Score */}
-          <div className="mt-20 p-8 bg-gradient-to-r from-purple-900/20 to-blue-900/20 rounded-3xl border border-purple-500/20">
-            <h2 className="text-3xl font-bold mb-4">10sPilot Score - Unified Visibility</h2>
-            <p className="text-gray-400 mb-6">SERP 40% + ChatGPT 30% + Perplexity 20% + AI Overview 10% = ONE Number 0-100</p>
-            <div className="text-6xl font-bold">87/100</div>
-            <div className="text-sm text-gray-500 mt-2">Example: 10sPilot.com for &apos;Best AI SEO tools&apos;</div>
           </div>
         </div>
       </section>
+
+      {/* How It Works */}
+      <section className="px-4 py-16 border-t border-white/10 sm:px-6 sm:py-24">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-2xl font-bold mb-12 sm:text-4xl sm:mb-16">How It Works</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-400 font-bold text-lg">
+                1
+              </div>
+              <h3 className="font-semibold text-lg">Open the diagnostic</h3>
+              <p className="text-gray-400 text-sm">Start a live AEO visibility check from your dashboard.</p>
+            </div>
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-400 font-bold text-lg">
+                2
+              </div>
+              <h3 className="font-semibold text-lg">We evaluate visibility</h3>
+              <p className="text-gray-400 text-sm">
+                The engine checks whether your brand is mentioned in an AI answer.
+              </p>
+            </div>
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-400 font-bold text-lg">
+                3
+              </div>
+              <h3 className="font-semibold text-lg">Review the result</h3>
+              <p className="text-gray-400 text-sm">
+                See mention status, answer position when available, and response context.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="px-4 py-16 border-t border-white/10 sm:px-6 sm:py-24">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-2xl font-bold mb-12 text-center sm:text-4xl">
+            Frequently Asked Questions
+          </h2>
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-lg font-semibold mb-2">What does the AEO diagnostic check?</h3>
+              <p className="text-gray-400">
+                It checks whether an AI answer mentions your brand and returns answer position
+                and context when available.
+              </p>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-2">
+                How is this different from regular SEO?
+              </h3>
+              <p className="text-gray-400">
+                No. It adds a focused view of brand visibility in AI search alongside your
+                existing search strategy.
+              </p>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-2">What results will I see?</h3>
+              <p className="text-gray-400">
+                The diagnostic shows mention status, reported answer position, and response context.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <SiteFooter />
     </main>
   )
 }

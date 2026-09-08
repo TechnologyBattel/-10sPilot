@@ -2,9 +2,10 @@
 
 from typing import Any
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from pydantic import BaseModel, Field
 
+from app.core.limiter import limiter
 from app.modules.serp_engine.free_serp import get_serp_results
 
 router = APIRouter(prefix="/api/v1/serp", tags=["serp"])
@@ -45,16 +46,17 @@ def _domain_position(results: list[dict[str, Any]], domain: str | None) -> int |
 
 
 @router.post("/search", response_model=SerpSearchResponse)
-async def search(request: SerpSearchRequest) -> SerpSearchResponse:
+@limiter.limit("20/minute")
+async def search(request: Request, payload: SerpSearchRequest) -> SerpSearchResponse:
     results = await get_serp_results(
-        request.keyword,
-        num_results=request.num_results,
-        country=request.country,
-        language=request.language,
+        payload.keyword,
+        num_results=payload.num_results,
+        country=payload.country,
+        language=payload.language,
     )
     return SerpSearchResponse(
-        keyword=request.keyword,
-        domain=request.domain,
+        keyword=payload.keyword,
+        domain=payload.domain,
         results=[SerpSearchResult.model_validate(item) for item in results],
-        domain_position=_domain_position(results, request.domain),
+        domain_position=_domain_position(results, payload.domain),
     )

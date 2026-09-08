@@ -1,8 +1,9 @@
 """Keyword engine HTTP router (mounted at /api/v1/keywords)."""
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from pydantic import BaseModel, Field
 
+from app.core.limiter import limiter
 from app.modules.keyword_engine.cluster import cluster_keywords
 from app.modules.keyword_engine.research import expand_keywords
 
@@ -37,18 +38,20 @@ class ClusterResponse(BaseModel):
 
 
 @router.post("/expand", response_model=ExpandResponse)
-async def expand(request: ExpandRequest) -> ExpandResponse:
+@limiter.limit("20/minute")
+async def expand(request: Request, payload: ExpandRequest) -> ExpandResponse:
     keywords = await expand_keywords(
-        request.seed,
-        limit=request.limit,
-        country=request.country,
-        language=request.language,
+        payload.seed,
+        limit=payload.limit,
+        country=payload.country,
+        language=payload.language,
     )
-    return ExpandResponse(seed=request.seed, keywords=keywords)
+    return ExpandResponse(seed=payload.seed, keywords=keywords)
 
 
 @router.post("/cluster", response_model=ClusterResponse)
-def cluster(request: ClusterRequest) -> ClusterResponse:
+@limiter.limit("20/minute")
+def cluster(request: Request, payload: ClusterRequest) -> ClusterResponse:
     return ClusterResponse.model_validate(
-        cluster_keywords(request.keywords, threshold=request.threshold)
+        cluster_keywords(payload.keywords, threshold=payload.threshold)
     )

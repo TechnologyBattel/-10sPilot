@@ -1,8 +1,9 @@
 """Content generation endpoints (AEO + GEO optimized)."""
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
+from app.core.limiter import limiter
 from app.modules.aeo_engine import AeoReport, AeoService
 from app.modules.content_engine import ContentBrief, ContentDraft, ContentRequest, ContentService
 from app.modules.geo_engine import GeoReport, GeoService
@@ -21,17 +22,20 @@ class OptimizeResponse(BaseModel):
 
 
 @router.post("/brief", response_model=ContentBrief)
-async def brief(request: ContentRequest) -> ContentBrief:
-    return await service.build_brief(request)
+@limiter.limit("5/minute")
+async def brief(request: Request, payload: ContentRequest) -> ContentBrief:
+    return await service.build_brief(payload)
 
 
 @router.post("/generate", response_model=ContentDraft)
-async def generate(request: ContentRequest) -> ContentDraft:
-    return await service.generate(request)
+@limiter.limit("5/minute")
+async def generate(request: Request, payload: ContentRequest) -> ContentDraft:
+    return await service.generate(payload)
 
 
 @router.post("/optimize", response_model=OptimizeResponse)
-def optimize(request: OptimizeRequest) -> OptimizeResponse:
+@limiter.limit("30/minute")
+def optimize(request: Request, payload: OptimizeRequest) -> OptimizeResponse:
     return OptimizeResponse(
-        aeo=AeoService().analyze(request.markdown), geo=GeoService().analyze(request.markdown)
+        aeo=AeoService().analyze(payload.markdown), geo=GeoService().analyze(payload.markdown)
     )

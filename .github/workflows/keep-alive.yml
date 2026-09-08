@@ -1,0 +1,42 @@
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    # Runs at 00:00 UTC every 3 days (well within Supabase's 7-day pause window)
+    - cron: '0 0 */3 * *'
+  workflow_dispatch: # Allows manual trigger from the GitHub Actions UI for testing
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase Database
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "Error: SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY secret is not configured."
+            exit 1
+          fi
+
+          # Query the projects table (limit 1) using the service-role key
+          response=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
+            -X GET "${SUPABASE_URL}/rest/v1/projects?select=id&limit=1" \
+            -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}")
+
+          http_code=$(echo "$response" | grep "HTTP_STATUS" | cut -d':' -f2)
+          body=$(echo "$response" | sed '/HTTP_STATUS/d')
+
+          echo "HTTP Status: $http_code"
+          echo "Response: $body"
+
+          # HTTP 200 or 206 confirms an active read against the database.
+          # HTTP 404 indicates reachability if migrations haven't run yet.
+          if [ "$http_code" -eq 200 ] || [ "$http_code" -eq 206 ] || [ "$http_code" -eq 404 ]; then
+            echo "Supabase keep-alive ping successful."
+          else
+            echo "Unexpected HTTP status: $http_code"
+            exit 1
+          fi

@@ -11,9 +11,9 @@ class Settings(BaseSettings):
     app_name: str = "10sPilot API"
     version: str = "0.1.0"
     environment: str = "development"
-    database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/tenspilot"
+    database_url: str
     api_cors_origins: str = "http://localhost:3000"
-    api_secret_key: str = "change-me"
+    api_secret_key: str
 
     # Free SERP data sources.
     serper_api_key: str | None = None

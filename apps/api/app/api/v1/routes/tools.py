@@ -2,10 +2,11 @@
 
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from app.core.errors import EngineError
+from app.core.limiter import limiter
 from app.tools.registry import default_registry
 
 router = APIRouter()
@@ -18,14 +19,16 @@ class ToolCallRequest(BaseModel):
 
 
 @router.get("")
-def list_tools() -> list[dict[str, Any]]:
+@limiter.limit("60/minute")
+def list_tools(request: Request) -> list[dict[str, Any]]:
     return registry.describe()
 
 
 @router.post("/call")
-async def call_tool(request: ToolCallRequest) -> dict[str, Any]:
+@limiter.limit("30/minute")
+async def call_tool(request: Request, payload: ToolCallRequest) -> dict[str, Any]:
     try:
-        return {"result": await registry.call(request.name, request.arguments)}
+        return {"result": await registry.call(payload.name, payload.arguments)}
     except KeyError as error:
         raise HTTPException(status_code=404, detail=str(error)) from error
     except EngineError as error:

@@ -30,7 +30,7 @@ export default function Dashboard() {
         const results = await getAEOCheck(
           '10sPilot',
           'Best SEO tools',
-          ['openai'],
+          ['groq'],
         )
 
         if (!cancelled) {
