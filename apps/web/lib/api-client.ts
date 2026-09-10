@@ -66,3 +66,26 @@ export function getAEOCheck(
     }),
   });
 }
+
+export type AuditIssue = {
+  check: string;
+  severity: string;
+  message: string;
+};
+
+export type AuditReport = {
+  url: string;
+  status_code: number;
+  score: number;
+  issues: AuditIssue[];
+  title: string | null;
+  meta_description: string | null;
+  word_count: number;
+};
+
+export function runAudit(url: string): Promise<AuditReport> {
+  return apiFetch<AuditReport>('/api/v1/audit', {
+    method: 'POST',
+    body: JSON.stringify({ url }),
+  });
+}
